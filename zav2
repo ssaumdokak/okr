@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Простий Форум</title>
+  <style>
+    #messageList div {
+      border: 1px solid black;
+      padding: 10px;
+      margin: 5px 0;
+    }
+    #messageList button {
+      margin-left: 10px;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Простий Форум</h1>
+  <form id="messageForm">
+    <textarea id="messageContent" placeholder="Ваше повідомлення" required></textarea>
+    <button type="submit">Додати повідомлення</button>
+  </form>
+  <div id="messageList"></div>
+
+  <script>
+    const form = document.getElementById('messageForm');
+    const messageList = document.getElementById('messageList');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const messageContent = document.getElementById('messageContent').value;
+      const messageDiv = document.createElement('div');
+      messageDiv.textContent = messageContent;
+
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = 'Видалити';
+      deleteButton.addEventListener('click', function() {
+        messageList.removeChild(messageDiv);
+      });
+
+      messageDiv.appendChild(deleteButton);
+      messageList.appendChild(messageDiv);
+      document.getElementById('messageContent').value = '';
+    });
+  </script>
+
+</body>
+</html>
