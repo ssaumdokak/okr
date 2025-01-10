@@ -1,50 +1,193 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Простий Форум</title>
+  <title>Simple Forum</title>
   <style>
-    #messageList div {
-      border: 1px solid black;
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    #forum-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .post {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 10px;
+      background-color: #f9f9f9;
+    }
+
+    .post .header {
+      font-weight: bold;
+    }
+
+    .post .content {
+      margin-top: 10px;
+    }
+
+    .post button {
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    .form-container {
+      margin-bottom: 20px;
+    }
+
+    .form-container input, .form-container textarea {
+      width: 100%;
       padding: 10px;
       margin: 5px 0;
+      border: 1px solid #ccc;
     }
-    #messageList button {
-      margin-left: 10px;
-      color: red;
+
+    .form-container button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .form-container button:hover {
+      background-color: #45a049;
+    }
+
+    .reply-button {
+      background-color: #2196F3;
+      color: white;
+    }
+
+    .edit-button {
+      background-color: #ff9800;
+      color: white;
+    }
+
+    .delete-button {
+      background-color: #f44336;
+      color: white;
     }
   </style>
 </head>
 <body>
 
-  <h1>Простий Форум</h1>
-  <form id="messageForm">
-    <textarea id="messageContent" placeholder="Ваше повідомлення" required></textarea>
-    <button type="submit">Додати повідомлення</button>
-  </form>
-  <div id="messageList"></div>
+  <div id="forum-container">
+    <h1>Simple Forum</h1>
+
+    <!-- Форма для додавання нових повідомлень -->
+    <div class="form-container">
+      <input type="text" id="postTitle" placeholder="Заголовок теми" required>
+      <textarea id="postContent" placeholder="Текст повідомлення" required></textarea>
+      <button id="submitPost">Додати повідомлення</button>
+    </div>
+
+    <!-- Список повідомлень -->
+    <div id="posts-list"></div>
+  </div>
 
   <script>
-    const form = document.getElementById('messageForm');
-    const messageList = document.getElementById('messageList');
+    // Масив для зберігання повідомлень
+    const posts = [];
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const messageContent = document.getElementById('messageContent').value;
-      const messageDiv = document.createElement('div');
-      messageDiv.textContent = messageContent;
+    // Функція для рендеринга повідомлень
+    function renderPosts() {
+      const postsList = document.getElementById("posts-list");
+      postsList.innerHTML = ''; // Очистити список перед рендерингом
 
-      const deleteButton = document.createElement('button');
-      deleteButton.textContent = 'Видалити';
-      deleteButton.addEventListener('click', function() {
-        messageList.removeChild(messageDiv);
+      posts.forEach((post, index) => {
+        const postElement = document.createElement("div");
+        postElement.classList.add("post");
+
+        const postHeader = document.createElement("div");
+        postHeader.classList.add("header");
+        postHeader.textContent = post.title;
+
+        const postContent = document.createElement("div");
+        postContent.classList.add("content");
+        postContent.textContent = post.content;
+
+        const replyButton = document.createElement("button");
+        replyButton.classList.add("reply-button");
+        replyButton.textContent = "Відповісти";
+        replyButton.addEventListener("click", () => replyToPost(index));
+
+        const editButton = document.createElement("button");
+        editButton.classList.add("edit-button");
+        editButton.textContent = "Редагувати";
+        editButton.addEventListener("click", () => editPost(index));
+
+        const deleteButton = document.createElement("button");
+        deleteButton.classList.add("delete-button");
+        deleteButton.textContent = "Видалити";
+        deleteButton.addEventListener("click", () => deletePost(index));
+
+        postElement.appendChild(postHeader);
+        postElement.appendChild(postContent);
+        postElement.appendChild(replyButton);
+        postElement.appendChild(editButton);
+        postElement.appendChild(deleteButton);
+
+        postsList.appendChild(postElement);
       });
+    }
 
-      messageDiv.appendChild(deleteButton);
-      messageList.appendChild(messageDiv);
-      document.getElementById('messageContent').value = '';
+    // Додавання нового повідомлення
+    document.getElementById("submitPost").addEventListener("click", () => {
+      const title = document.getElementById("postTitle").value;
+      const content = document.getElementById("postContent").value;
+
+      if (title && content) {
+        posts.push({ title, content });
+        renderPosts();
+        document.getElementById("postTitle").value = '';
+        document.getElementById("postContent").value = '';
+      } else {
+        alert("Будь ласка, заповніть всі поля.");
+      }
     });
+
+    // Видалення повідомлення
+    function deletePost(index) {
+      if (confirm("Ви впевнені, що хочете видалити це повідомлення?")) {
+        posts.splice(index, 1);
+        renderPosts();
+      }
+    }
+
+    // Редагування повідомлення
+    function editPost(index) {
+      const newTitle = prompt("Введіть новий заголовок", posts[index].title);
+      const newContent = prompt("Введіть новий текст повідомлення", posts[index].content);
+
+      if (newTitle !== null && newContent !== null) {
+        posts[index].title = newTitle;
+        posts[index].content = newContent;
+        renderPosts();
+      }
+    }
+
+    // Відповідь на повідомлення
+    function replyToPost(index) {
+      const replyContent = prompt("Ваша відповідь:");
+
+      if (replyContent !== null) {
+        posts.push({
+          title: `Відповідь на: ${posts[index].title}`,
+          content: replyContent
+        });
+        renderPosts();
+      }
+    }
   </script>
 
 </body>
