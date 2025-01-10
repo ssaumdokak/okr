@@ -73,7 +73,7 @@
   </div>
 
   <!-- Слайдер зображень -->
-  <div class="swiper-container">
+  <div class="swiper-container" id="swiper-container">
     <div class="swiper-wrapper" id="swiper-wrapper">
       <!-- Слайди будуть додані динамічно через JavaScript -->
     </div>
@@ -90,17 +90,17 @@
     const images = [
       {
         title: "Sunset",
-        url: "https://example.com/sunset.jpg",
+        url: "https://upload.wikimedia.org/wikipedia/commons/5/58/Sunset_2007-1.jpg",
         description: "A beautiful sunset."
       },
       {
         title: "Mountain",
-        url: "https://example.com/mountain.jpg",
+        url: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg",
         description: "Snow-covered mountains."
       },
       {
         title: "Forest",
-        url: "https://example.com/forest.jpg",
+        url: "https://treesforall.nl/app/uploads/2022/03/Bos-Nederland-Epe-e1719389547661-0x835-c-default.webp",
         description: "A peaceful forest."
       }
     ];
@@ -114,12 +114,18 @@
     const caption = document.getElementById("caption");
     const closeModal = document.getElementsByClassName("close")[0];
 
+    // Слайдер
+    const swiperContainer = document.getElementById("swiper-container");
+
     // Створення галереї
     images.forEach((image, index) => {
       const img = document.createElement("img");
       img.src = image.url;
       img.alt = image.title;
       img.addEventListener("click", () => {
+        // Сховати слайдер при відкритті модального вікна
+        swiperContainer.style.display = "none";
+        
         modal.style.display = "block";
         modalImage.src = image.url;
         caption.textContent = image.description;
@@ -138,12 +144,16 @@
     // Закриття модального вікна
     closeModal.onclick = function() {
       modal.style.display = "none";
+      // Показати слайдер після закриття модального вікна
+      swiperContainer.style.display = "block";
     };
 
     // Закриття модального вікна при кліку поза зображенням
     window.onclick = function(event) {
       if (event.target === modal) {
         modal.style.display = "none";
+        // Показати слайдер після закриття модального вікна
+        swiperContainer.style.display = "block";
       }
     };
 
