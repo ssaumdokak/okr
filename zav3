@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do Список</title>
+  <style>
+    #taskList li {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px;
+      margin: 5px 0;
+      border: 1px solid black;
+    }
+    #taskList button {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>To-Do Список</h1>
+  <form id="todoForm">
+    <input type="text" id="task" placeholder="Нове завдання" required>
+    <button type="submit">Додати</button>
+  </form>
+  <ul id="taskList"></ul>
+
+  <script>
+    const todoForm = document.getElementById('todoForm');
+    const taskList = document.getElementById('taskList');
+
+    todoForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const task = document.getElementById('task').value;
+      const taskItem = document.createElement('li');
+      taskItem.textContent = task;
+
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = 'Видалити';
+      deleteButton.addEventListener('click', function() {
+        taskList.removeChild(taskItem);
+      });
+
+      taskItem.appendChild(deleteButton);
+      taskList.appendChild(taskItem);
+      document.getElementById('task').value = '';
+    });
+  </script>
+
+</body>
+</html>
