@@ -1,51 +1,181 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>To-Do Список</title>
+  <title>To-Do List</title>
   <style>
-    #taskList li {
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .todo-form input,
+    .todo-form select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .todo-form button {
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .todo-form button:hover {
+      background-color: #45a049;
+    }
+
+    .todo-list {
+      margin-top: 20px;
+    }
+
+    .todo-item {
+      background-color: #f9f9f9;
+      padding: 10px;
+      margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
-      padding: 5px;
-      margin: 5px 0;
-      border: 1px solid black;
+      align-items: center;
+      border: 1px solid #ddd;
+      border-radius: 4px;
     }
-    #taskList button {
-      color: red;
+
+    .todo-item.completed {
+      text-decoration: line-through;
+      background-color: #e0e0e0;
+    }
+
+    .todo-item button {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 4px;
+    }
+
+    .todo-item button.edit-button {
+      background-color: #ff9800;
+    }
+
+    .todo-item button.complete-button {
+      background-color: #2196F3;
+    }
+
+    .category-select {
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
 
-  <h1>To-Do Список</h1>
-  <form id="todoForm">
-    <input type="text" id="task" placeholder="Нове завдання" required>
-    <button type="submit">Додати</button>
-  </form>
-  <ul id="taskList"></ul>
+  <h1>To-Do List</h1>
+
+  <!-- Форма для додавання завдань -->
+  <div class="todo-form">
+    <input type="text" id="taskName" placeholder="Введіть нове завдання" required>
+    <select id="taskCategory">
+      <option value="General">Загальна</option>
+      <option value="Work">Робота</option>
+      <option value="Personal">Особисті</option>
+    </select>
+    <button id="addTaskButton">Додати завдання</button>
+  </div>
+
+  <!-- Список завдань -->
+  <div class="todo-list" id="todoList"></div>
 
   <script>
-    const todoForm = document.getElementById('todoForm');
-    const taskList = document.getElementById('taskList');
+    // Завдання будуть зберігатись в localStorage
+    const todoList = JSON.parse(localStorage.getItem('todoList')) || [];
 
-    todoForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const task = document.getElementById('task').value;
-      const taskItem = document.createElement('li');
-      taskItem.textContent = task;
+    // Функція для рендерингу завдань
+    function renderTasks() {
+      const listContainer = document.getElementById('todoList');
+      listContainer.innerHTML = '';
 
-      const deleteButton = document.createElement('button');
-      deleteButton.textContent = 'Видалити';
-      deleteButton.addEventListener('click', function() {
-        taskList.removeChild(taskItem);
+      todoList.forEach((task, index) => {
+        const taskElement = document.createElement('div');
+        taskElement.classList.add('todo-item');
+        if (task.completed) {
+          taskElement.classList.add('completed');
+        }
+
+        taskElement.innerHTML = `
+          <span><strong>${task.name}</strong> (${task.category})</span>
+          <div>
+            <button class="complete-button" onclick="toggleComplete(${index})">${task.completed ? 'Відновити' : 'Завершити'}</button>
+            <button class="edit-button" onclick="editTask(${index})">Редагувати</button>
+            <button class="delete-button" onclick="deleteTask(${index})">Видалити</button>
+          </div>
+        `;
+
+        listContainer.appendChild(taskElement);
       });
 
-      taskItem.appendChild(deleteButton);
-      taskList.appendChild(taskItem);
-      document.getElementById('task').value = '';
+      // Зберігаємо оновлений список у localStorage
+      localStorage.setItem('todoList', JSON.stringify(todoList));
+    }
+
+    // Додавання нового завдання
+    document.getElementById('addTaskButton').addEventListener('click', () => {
+      const taskName = document.getElementById('taskName').value.trim();
+      const taskCategory = document.getElementById('taskCategory').value;
+
+      if (taskName) {
+        const newTask = {
+          name: taskName,
+          category: taskCategory,
+          completed: false
+        };
+
+        todoList.push(newTask);
+        renderTasks();
+
+        // Очищаємо поле вводу
+        document.getElementById('taskName').value = '';
+      }
     });
+
+    // Перемикання статусу завдання на виконано / невиконано
+    function toggleComplete(index) {
+      todoList[index].completed = !todoList[index].completed;
+      renderTasks();
+    }
+
+    // Видалення завдання
+    function deleteTask(index) {
+      if (confirm('Ви впевнені, що хочете видалити це завдання?')) {
+        todoList.splice(index, 1);
+        renderTasks();
+      }
+    }
+
+    // Редагування завдання
+    function editTask(index) {
+      const newName = prompt('Введіть нову назву завдання:', todoList[index].name);
+
+      if (newName !== null && newName.trim() !== '') {
+        todoList[index].name = newName.trim();
+        renderTasks();
+      }
+    }
+
+    // Початковий рендеринг завдань
+    renderTasks();
   </script>
 
 </body>
